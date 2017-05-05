@@ -94,5 +94,6 @@ public class Person_Test {
 		PersonDAL.deletePerson(per2id);
 		assertFalse(PersonDAL.getPersons().contains(p2));
 	}
+	
 
 }
