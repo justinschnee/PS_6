@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import domain.PersonDomainModel;
+import domain.StudentDomainModel;
 import util.HibernateUtil;
 
 public class PersonDAL {
@@ -18,7 +19,7 @@ public class PersonDAL {
 	public static PersonDomainModel addPerson(PersonDomainModel per) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Transaction tx = null;
-		int employeeID = 0;
+ 
 		try {
 			tx = session.beginTransaction();
 			session.save(per);
@@ -36,14 +37,14 @@ public class PersonDAL {
 	public static ArrayList<PersonDomainModel> getPersons() {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Transaction tx = null;
-		PersonDomainModel perGet = null;		
+		StudentDomainModel perGet = null;		
 		ArrayList<PersonDomainModel> pers = new ArrayList<PersonDomainModel>();
 		
 		try {
 			tx = session.beginTransaction();	
 			
-			List person = session.createQuery("FROM PersonDomainModel").list();
-			for (Iterator iterator = person.iterator(); iterator.hasNext();) {
+			List students = session.createQuery("FROM StudentDomainModel").list();
+			for (Iterator iterator = students.iterator(); iterator.hasNext();) {
 				PersonDomainModel per = (PersonDomainModel) iterator.next();
 				pers.add(per);
 
@@ -69,12 +70,15 @@ public class PersonDAL {
 		try {
 			tx = session.beginTransaction();	
 									
-			Query query = session.createQuery("from PersonModel where studentId = :id ");
+			Query query = session.createQuery("from PersonDomainModel where PersonId = :id ");
 			query.setParameter("id", perID.toString());
 			
 			List<?> list = query.list();
-			perGet = (PersonDomainModel)list.get(0);
-			
+			if((list !=null) && (list.size() ==1)) {
+				perGet = (PersonDomainModel) list.get(0);
+			} else
+				return null;			
+					
 			tx.commit();
 		} catch (HibernateException e) {
 			if (tx != null)
@@ -95,7 +99,8 @@ public class PersonDAL {
 			tx = session.beginTransaction();	
 									
 			PersonDomainModel per = (PersonDomainModel) session.get(PersonDomainModel.class, perID);
-			session.delete(per);
+			if (per !=null)
+				session.delete(per);
 		
 			
 			tx.commit();
